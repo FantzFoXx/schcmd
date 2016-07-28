@@ -13,9 +13,8 @@ typedef struct	s_cmd_meta
 	struct s_cmd_meta	*next;
 }				t_cmd_meta;
 
-int			shrcmd(int ac, char **av, char **environ);
+int			shrcmd(char **av);
 int			search_expr(char **search, gzFile manpage, int fd_manpage);
-//int		search_expr(char **search, struct gzFile_s manpage);
 void		cmd_meta_push(t_cmd_meta **first, t_cmd_meta *new);
 t_cmd_meta	*cmd_meta_new(char	*filename);
 

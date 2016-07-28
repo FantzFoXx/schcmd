@@ -13,7 +13,7 @@
 CC = clang
 FLAGS = -Wall -Werror -Wextra
 NAME = shrcmd
-SRC = main.c shrcmd.c meta_lists.c
+SRC = main.c shrcmd.c meta_lists.c get_next_line_gz.c
 
 
 OBJ = $(SRC:.c=.o)
