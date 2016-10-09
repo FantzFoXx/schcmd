@@ -11,6 +11,7 @@ t_cmd_meta	*cmd_meta_new(char	*filename)
 		new->filename = ft_strdup(filename);
 		new->fd = 0;
 		new->match_count = 0;
+		new->printable = 0;
 		new->next = NULL;
 	}
 	return (new);

@@ -6,6 +6,8 @@
 #include "zlib.h"
 #include <stdio.h>
 
+int sort = 0;
+
 int		read_mode_select(gzFile manpage, int fd_manpage, char **buf)
 {
 	if (manpage)
@@ -20,7 +22,7 @@ int		*create_associate_tab_search(int size_tab)
 	int		*tab_values = NULL;
 
 	tab_values = (int *)malloc(sizeof(int) * size_tab);
-	ft_bzero(tab_values, sizeof(tab_values));
+	ft_bzero(tab_values, sizeof(*tab_values) * size_tab);
 	return (tab_values);
 }
 
@@ -137,10 +139,36 @@ void	print_command_data(t_cmd_meta *file)
 		printf(" : %d matchs\n", file->match_count);
 }
 
+void	sort_results(t_cmd_meta *files)
+{
+	t_cmd_meta	*first_node = files;
+	int			count_back = 0;
+	char		*filename_back = NULL;
+
+	while (files && files->next)
+	{
+		if (files->match_count < files->next->match_count)
+		{
+			count_back = files->match_count;
+			filename_back = files->filename;
+
+			files->match_count = files->next->match_count;
+			files->filename = files->next->filename;
+
+			files->next->match_count = count_back;
+			files->next->filename = filename_back;
+
+			files = first_node;
+		}
+		files = files->next;
+	}
+}
+
 void	search_in_files(t_cmd_meta *files, char **keywords)
 {
 	gzFile		file = NULL;
 	int			fd_file = 0;
+	t_cmd_meta	*first_node = files;
 
 	ft_putendl("Commands found : ");
 	while (files)
@@ -154,7 +182,7 @@ void	search_in_files(t_cmd_meta *files, char **keywords)
 		}
 		if (file || fd_file)
 		{
-			if ((files->match_count = search_expr(keywords, file, fd_file)))
+			if ((files->match_count = search_expr(keywords, file, fd_file)) > 0 && !sort)
 				print_command_data(files);
 			if (file)
 				gzclose(file);
@@ -164,6 +192,14 @@ void	search_in_files(t_cmd_meta *files, char **keywords)
 			file = NULL;
 		}
 		files = files->next;
+	}
+	if (sort) {
+		sort_results(first_node);
+		while (first_node) {
+			if (first_node->match_count)
+				print_command_data(first_node);
+			first_node = first_node->next;
+		}
 	}
 }
 
@@ -193,6 +229,13 @@ int		shrcmd(char **av)
 	char	**keywords = NULL;
 	t_cmd_meta	*files;
 	t_cmd_meta	*bak;
+
+	// make function to do this
+	if (ft_strcmp(av[1], "--sort") == 0) {
+		av = &av[1];
+		sort = 1;
+	}
+	//************************
 
 	man_path = get_man_path_environ();
 	bak = files = get_all_files(man_path);

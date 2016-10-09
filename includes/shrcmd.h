@@ -9,6 +9,7 @@ typedef struct	s_cmd_meta
 {
 	char				*filename;
 	int					fd;
+	int					printable;
 	int					match_count;
 	struct s_cmd_meta	*next;
 }				t_cmd_meta;
